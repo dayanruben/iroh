@@ -15,13 +15,14 @@ permissions:
 jobs:
   add-to-project:
     name: Add to project board
-    if: github.repository == 'dayanruben/iroh' && secrets.N0_BOT_APP_ID != '' && secrets.PROJECT_BOARD_PKEY != ''
     runs-on: ubuntu-latest
     steps:
       - uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
         id: app-token
+        if: github.repository == 'dayanruben/iroh'
+        continue-on-error: true
         with:
-          app-id: ${{ secrets.N0_BOT_APP_ID }}
+          client-id: ${{ secrets.N0_BOT_APP_ID }}
           private-key: ${{ secrets.PROJECT_BOARD_PKEY }}
           owner: n0-computer
           # Omitting permission-contents is the point: no code write anywhere.
@@ -30,6 +31,7 @@ jobs:
           permission-organization-projects: write
 
       - name: Update PRs
+        if: steps.app-token.outcome == 'success'
         env:
           GH_TOKEN: ${{ steps.app-token.outputs.token }}
         run: |
@@ -44,6 +46,7 @@ jobs:
           done
 
       - name: Update ISSUEs
+        if: steps.app-token.outcome == 'success'
         env:
           GH_TOKEN: ${{ steps.app-token.outputs.token }}
         run: |

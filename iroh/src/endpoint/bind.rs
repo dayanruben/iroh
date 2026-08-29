@@ -232,6 +232,7 @@ impl ToSocketAddr for String {
 }
 
 #[allow(missing_docs)]
+#[allow(unreachable_code)]
 #[stack_error(derive, add_meta, from_sources)]
 #[non_exhaustive]
 pub enum InvalidSocketAddr {

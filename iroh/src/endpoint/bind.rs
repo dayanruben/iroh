@@ -232,13 +232,12 @@ impl ToSocketAddr for String {
 }
 
 #[allow(missing_docs)]
-#[allow(unreachable_code)]
-#[stack_error(derive, add_meta, from_sources)]
+#[stack_error(derive, add_meta)]
 #[non_exhaustive]
 pub enum InvalidSocketAddr {
     #[error(transparent)]
     AddrParse {
-        #[error(std_err)]
+        #[error(from, std_err)]
         source: std::net::AddrParseError,
     },
     #[error("Invalid IP prefix length")]
@@ -250,4 +249,10 @@ pub enum InvalidSocketAddr {
     },
     #[error("Only a single default address can be set per IP family")]
     DuplicateDefaultAddr,
+}
+
+impl From<Infallible> for InvalidSocketAddr {
+    fn from(source: Infallible) -> Self {
+        match source {}
+    }
 }

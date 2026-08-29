@@ -204,11 +204,30 @@ jobs:
           OVERFLOW_RUNNER: ${{ inputs.overflow_runner }}
           BS_MATCH: ${{ inputs.blacksmith_busy_match }}
           ORG: ${{ inputs.org }}
+          IS_FORK: ${{ github.event.repository.fork }}
           GH_TOKEN: ${{ secrets.RUNNER_READ_TOKEN || github.token }}
         shell: bash
         run: |
           set -euo pipefail
           echo "core=${CORE_RUNNER}" >> "$GITHUB_OUTPUT"
+
+          # Forks do not have access to the upstream self-hosted or Blacksmith
+          # pools. Route compatible jobs to GitHub-hosted Ubuntu runners so a
+          # fork push cannot remain queued indefinitely waiting for upstream
+          # capacity. Platform-specific jobs add their own fork guards.
+          if [[ "${IS_FORK}" == "true" ]]; then
+            ROUTE="all GitHub-hosted (fork)"
+            IDLE="0"
+            BS_BUSY="0"
+            for i in $(seq 1 16); do
+              echo "overflow_${i}=[\"ubuntu-latest\"]" >> "$GITHUB_OUTPUT"
+            done
+            echo "decision=${ROUTE}" >> "$GITHUB_OUTPUT"
+            echo "idle=${IDLE}" >> "$GITHUB_OUTPUT"
+            echo "blacksmith_busy=${BS_BUSY}" >> "$GITHUB_OUTPUT"
+            echo "Decision: ${ROUTE}"
+            exit 0
+          fi
 
           # One paginated fetch, counted twice. Avoid a second round-trip.
           RUNNERS_JSON="$(gh api "/orgs/${ORG}/actions/runners" --paginate 2>/dev/null || echo '')"

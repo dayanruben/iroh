@@ -25,6 +25,8 @@ jobs:
   patchbay_tests:
     name: Patchbay Tests
     timeout-minutes: 15
+    # Patchbay requires the upstream self-hosted Linux environment.
+    if: ${{ !github.event.repository.fork }}
     runs-on: [self-hosted, linux, X64]
     env:
       RUSTC_WRAPPER: "sccache"

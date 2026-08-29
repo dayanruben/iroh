@@ -43,7 +43,7 @@ jobs:
     permissions:
       contents: read
       pull-requests: write   # netsim_runner posts the report comment
-    if: ${{github.ref_name=='main' && github.event_name == 'push'}}
+    if: ${{github.ref_name=='main' && github.event_name == 'push' && !github.event.repository.fork}}
     uses: './.github/workflows/netsim_runner.yaml'
     secrets:
       S3_ACCESS_KEY_ID: ${{ secrets.S3_ACCESS_KEY_ID }}
@@ -65,7 +65,7 @@ jobs:
     permissions:
       contents: read
       pull-requests: write   # netsim_runner posts the report comment
-    if: ${{github.event_name != 'push'}}
+    if: ${{github.event_name != 'push' && !github.event.repository.fork}}
     uses: './.github/workflows/netsim_runner.yaml'
     secrets:
       S3_ACCESS_KEY_ID: ${{ secrets.S3_ACCESS_KEY_ID }}

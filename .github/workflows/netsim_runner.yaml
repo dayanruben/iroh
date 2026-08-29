@@ -50,11 +50,11 @@ on:
         required: true
         type: string
       max_workers:
-        required: true
+        required: false
         type: number
         default: 4
       netsim_branch:
-        required: true
+        required: false
         type: string
         default: "main"
       rust_log:
@@ -120,6 +120,9 @@ jobs:
       pull-requests: write   # posts the report comment
     name: Netsim
     timeout-minutes: 45
+    # The netsim environment and report buckets belong to upstream; forks
+    # should keep CI green without waiting for that private runner pool.
+    if: ${{ !github.event.repository.fork }}
     runs-on: [self-hosted, linux, X64]
     steps:
     - name: Checkout

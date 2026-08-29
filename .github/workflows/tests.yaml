@@ -83,25 +83,26 @@ jobs:
               release-os: linux                                                                                     
               release-arch: amd64     
               runs_on: ${{ needs.pick-runner.outputs.overflow_3 }}
-            # mac cells always stay on self-hosted mac (not in the routing pool)                                                                                           
+            # Forks use hosted Ubuntu for these portable cells; upstream keeps
+            # the dedicated macOS runner for the platform-specific coverage.
             - name: macOS-arm-latest                                                                                                                                       
               features: all                                                                                                                                                
               os: macOS-latest                                                                                                                                             
               release-os: darwin                                                                                                                                           
               release-arch: aarch64   
-              runs_on: '["self-hosted","macOS","ARM64"]'                                                                                                                   
+              runs_on: ${{ github.event.repository.fork && '["ubuntu-latest"]' || '["self-hosted","macOS","ARM64"]' }}
             - name: macOS-arm-latest                                                                                
               features: none                                                                                                                                               
               os: macOS-latest
               release-os: darwin                                                                                                                                           
               release-arch: aarch64                                                                                 
-              runs_on: '["self-hosted","macOS","ARM64"]'
+              runs_on: ${{ github.event.repository.fork && '["ubuntu-latest"]' || '["self-hosted","macOS","ARM64"]' }}
             - name: macOS-arm-latest                                                                                                                                       
               features: default
               os: macOS-latest                                                                                                                                             
               release-os: darwin                                                                                    
               release-arch: aarch64   
-              runs_on: '["self-hosted","macOS","ARM64"]'
+              runs_on: ${{ github.event.repository.fork && '["ubuntu-latest"]' || '["self-hosted","macOS","ARM64"]' }}
     env:
       # Using self-hosted runners so use local cache for sccache and
       # not SCCACHE_GHA_ENABLED.
@@ -220,6 +221,9 @@ jobs:
   build_and_test_windows:
     timeout-minutes: 30
     name: "Tests"
+    # Windows validation requires the upstream self-hosted or Blacksmith pool.
+    # A fork without that pool should report a clean skip, not queue forever.
+    if: ${{ !github.event.repository.fork }}
     needs: pick-runner-windows
     runs-on: ${{ fromJSON(matrix.runs_on) }}
     strategy:

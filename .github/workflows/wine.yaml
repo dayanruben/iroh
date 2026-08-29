@@ -29,6 +29,8 @@ jobs:
 
   wine_test:
     name: Wine Sanity Check
+    # Wine validation requires the upstream self-hosted Linux environment.
+    if: ${{ !github.event.repository.fork }}
     needs: pick-runner
     runs-on: ${{ fromJSON(needs.pick-runner.outputs.overflow_1) }}
     # runs-on: [self-hosted, linux, X64]

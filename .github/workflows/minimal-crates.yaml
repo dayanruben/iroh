@@ -15,6 +15,10 @@ env:
   RUSTFLAGS: -Dwarnings
   RUSTDOCFLAGS: -Dwarnings
   SCCACHE_CACHE_SIZE: "10G"
+  # Forks are compatibility-validation targets rather than release gates. The
+  # minimal-version build still runs, but it must not fail solely because the
+  # newest compatible crate has not aged past upstream's release threshold.
+  CARGO_RESOLVER_INCOMPATIBLE_PUBLISH_AGE: ${{ github.event.repository.fork && 'allow' || '' }}
 
 # Default to read-only; jobs that need more grant it explicitly.
 permissions:

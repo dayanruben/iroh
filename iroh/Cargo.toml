@@ -1,6 +1,6 @@
 [package]
 name = "iroh"
-version = "1.4.1"
+version = "1.5.0"
 edition = "2024"
 readme = "README.md"
 description = "p2p quic connections dialed by public key"
@@ -253,4 +253,8 @@ required-features = ["tls-aws-lc-rs"]
 
 [[example]]
 name = "home-relay-status"
+required-features = []
+
+[[example]]
+name = "stream_affinity_direct"
 required-features = []
